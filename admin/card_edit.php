@@ -1,5 +1,10 @@
 <?php
 include 'db.php';
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
 
 // Fetch existing data
 $query = "SELECT * FROM card WHERE id=1 LIMIT 1";

@@ -1,11 +1,8 @@
 <?php
-// session_start();
-
-// Check if admin is logged in, else redirect to login.php
-// if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-//     header('Location: login.php');
-//     exit;
-// }
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
 
 include 'db.php';  // your DB connection
 

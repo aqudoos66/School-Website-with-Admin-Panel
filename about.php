@@ -1,35 +1,50 @@
 <?php
-include 'admin/db.php'; // Database connection
+include 'admin/db.php'; // ✅ Only include once
 
-// Fetch footer data
+// ---------------- Fetch Footer ----------------
 $sql = "SELECT * FROM footer WHERE id = 1 LIMIT 1";
-$result = $conn->query($sql);
-$footerData = $result && $result->num_rows > 0 ? $result->fetch_assoc() : [
-    'address' => '',
-    'phone' => '',
-    'email' => '',
-    'quick_links' => '',
-    'newsletter_text' => ''
+$result = mysqli_query($conn, $sql);
+$footerData = $result && mysqli_num_rows($result) > 0 ? mysqli_fetch_assoc($result) : [
+    'address' => 'Default Address',
+    'phone' => '0000-0000000',
+    'email' => 'info@example.com',
+    'quick_links' => 'Home|About Us|Contact Us',
+    'newsletter_text' => 'Subscribe to our newsletter.'
 ];
-
-// Quick links array
 $quickLinks = !empty($footerData['quick_links']) ? explode('|', $footerData['quick_links']) : [];
-?>
 
-<?php
-include 'admin/db.php';
-
-// Fetch about us data
+// ---------------- Fetch About Us ----------------
 $query = "SELECT * FROM about_us WHERE id=1 LIMIT 1";
 $result = mysqli_query($conn, $query);
-$about = mysqli_fetch_assoc($result);
-?>
+$about = $result && mysqli_num_rows($result) > 0 ? mysqli_fetch_assoc($result) : [
+    'title' => 'Learn More About Our Work And Our Cultural Activities',
+    'description1' => 'Default description 1.',
+    'description2' => 'Default description 2.',
+    'button_text' => 'Read More',
+    'person_name' => 'Default Person',
+    'designation' => 'Default Designation',
+    'img1' => 'img/default1.jpg',
+    'img2' => 'img/default2.jpg',
+    'img3' => 'img/default3.jpg'
+];
 
-<?php
-include 'admin/db.php';
+// ---------------- Fetch Teacher Section ----------------
 $query = "SELECT * FROM teacher_section WHERE id=1 LIMIT 1";
 $result = mysqli_query($conn, $query);
-$teacher = mysqli_fetch_assoc($result);
+$teacher = $result && mysqli_num_rows($result) > 0 ? mysqli_fetch_assoc($result) : [
+    'image' => 'img/default-teacher.jpg',
+    'title' => 'Our Teachers',
+    'description' => 'Teacher section data not available.'
+];
+
+// ---------------- Fetch Principal Card ----------------
+$cardQuery = "SELECT principal_name, principal_designation, principal_image FROM card WHERE id=1 LIMIT 1";
+$cardResult = mysqli_query($conn, $cardQuery);
+$card = $cardResult && mysqli_num_rows($cardResult) > 0 ? mysqli_fetch_assoc($cardResult) : [
+    'principal_name' => 'Default Principal',
+    'principal_designation' => 'Head of Department',
+    'principal_image' => 'img/default-principal.jpg'
+];
 ?>
 
 <!DOCTYPE html>
@@ -225,7 +240,7 @@ $teacher = mysqli_fetch_assoc($result);
                     </div>
                     <div class="col-sm-6">
                         <div class="d-flex align-items-center">
-                            <img class="rounded-circle flex-shrink-0" src="<?= $about['person_image'] ?>" alt="" style="width: 45px; height: 45px;">
+                            <img class="rounded-circle flex-shrink-0" src="admin/<?= $card['principal_image']; ?>" alt="" style="width: 45px; height: 45px;">
                             <div class="ms-3">
                                 <h6 class="text-primary mb-1"><?= $about['person_name'] ?></h6>
                                 <small><?= $about['designation'] ?></small>
@@ -237,13 +252,13 @@ $teacher = mysqli_fetch_assoc($result);
             <div class="col-lg-6 about-img wow fadeInUp" data-wow-delay="0.5s">
                 <div class="row">
                     <div class="col-12 text-center">
-                        <img class="img-fluid w-75 rounded-circle bg-light p-3" src="<?= $about['img1'] ?>" alt="">
+                        <img class="img-fluid w-75 rounded-circle bg-light p-3" src="admin/<?= $about['img1'] ?>" alt="">
                     </div>
                     <div class="col-6 text-start" style="margin-top: -150px;">
-                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="<?= $about['img2'] ?>" alt="">
+                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="admin/<?= $about['img2'] ?>" alt="">
                     </div>
                     <div class="col-6 text-end" style="margin-top: -150px;">
-                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="<?= $about['img3'] ?>" alt="">
+                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="admin/<?= $about['img3'] ?>" alt="">
                     </div>
                 </div>
             </div>
@@ -259,7 +274,7 @@ $teacher = mysqli_fetch_assoc($result);
                 <!-- Image Column -->
                 <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s" style="min-height: 400px;">
                     <div class="position-relative h-100">
-                        <img class="position-absolute w-100 h-100 rounded" src="<?= $teacher['image'] ?>" style="object-fit: cover;">
+                        <img class="position-absolute w-100 h-100 rounded" src="admin/<?= $teacher['image'] ?>" style="object-fit: cover;">
                     </div>
                 </div>
                 <!-- Content Column -->

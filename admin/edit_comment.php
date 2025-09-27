@@ -1,5 +1,13 @@
 <?php
+// session_start();
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
 include 'db.php';
+
+
 
 // --------------------- Add Comment ---------------------
 if (isset($_POST['add_comment'])) {
@@ -21,7 +29,7 @@ if (isset($_POST['add_comment'])) {
 
     mysqli_query($conn, "INSERT INTO testimonials (client_name, profession, comment, image) 
                 VALUES ('$client_name','$profession','$comment','$image')");
-    header("Location: dashboard.php?page=edit_comment");
+    header("Location: index.php?page=edit_comment");
     exit();
 }
 
@@ -46,7 +54,7 @@ if (isset($_POST['update_comment'])) {
     mysqli_query($conn, "UPDATE testimonials 
                          SET client_name='$client_name', profession='$profession', comment='$comment' $image_query
                          WHERE id=$id");
-    header("Location: dashboard.php?page=edit_comment");
+    header("Location: index.php?page=edit_comment");
     exit();
 }
 
@@ -54,7 +62,7 @@ if (isset($_POST['update_comment'])) {
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     mysqli_query($conn, "DELETE FROM testimonials WHERE id=$id");
-    header("Location: dashboard.php?page=edit_comment");
+    header("Location: index.php?page=edit_comment");
     exit();
 }
 
@@ -135,7 +143,7 @@ if (isset($_GET['edit'])) {
 
         <?php if ($editData) { ?>
             <button type="submit" name="update_comment" class="btn btn-primary btn-rounded mt-3">✏ Update Comment</button>
-            <a href="dashboard.php?page=edit_comment" class="btn btn-secondary btn-rounded mt-3">Cancel</a>
+            <a href="index.php?page=edit_comment" class="btn btn-secondary btn-rounded mt-3">Cancel</a>
         <?php } else { ?>
             <button type="submit" name="add_comment" class="btn btn-success btn-rounded mt-3">➕ Add Comment</button>
         <?php } ?>
@@ -154,8 +162,8 @@ if (isset($_GET['edit'])) {
                         <p><?= htmlspecialchars($row['comment']); ?></p>
                     </div>
                     <div class="ms-auto">
-                        <a href="dashboard.php?page=edit_comment&edit=<?= $row['id']; ?>" class="btn btn-primary btn-sm me-2">✏ Edit</a>
-                        <a href="dashboard.php?page=edit_comment&delete=<?= $row['id']; ?>" 
+                        <a href="index.php?page=edit_comment&edit=<?= $row['id']; ?>" class="btn btn-primary btn-sm me-2">✏ Edit</a>
+                        <a href="index.php?page=edit_comment&delete=<?= $row['id']; ?>" 
                            class="btn btn-danger btn-sm"
                            onclick="return confirm('Are you sure you want to delete this comment?');">🗑 Delete</a>
                     </div>

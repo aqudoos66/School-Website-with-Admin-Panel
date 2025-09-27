@@ -394,13 +394,13 @@ $(document).ready(function(){
             <div class="col-lg-6 about-img wow fadeInUp" data-wow-delay="0.5s">
                 <div class="row">
                     <div class="col-12 text-center">
-                        <img class="img-fluid w-75 rounded-circle bg-light p-3" src="<?= $card['image1']; ?>" alt="">
+                        <img class="img-fluid w-75 rounded-circle bg-light p-3" src="admin/<?= $card['image1']; ?>" alt="">
                     </div>
                     <div class="col-6 text-start" style="margin-top: -150px;">
-                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="<?= $card['image2']; ?>" alt="">
+                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="admin/<?= $card['image2']; ?>" alt="">
                     </div>
                     <div class="col-6 text-end" style="margin-top: -150px;">
-                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="<?= $card['image3']; ?>" alt="">
+                        <img class="img-fluid w-100 rounded-circle bg-light p-3" src="admin/<?= $card['image3']; ?>" alt="">
                     </div>
                 </div>
             </div>

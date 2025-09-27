@@ -1,5 +1,11 @@
 <?php
 include 'db.php'; // DB connection
+session_start();
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
 
 // Uploads folder
 $uploadDir = "UPLOADS/classes/";
@@ -48,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->execute();
     $stmt->close();
 
-    header("Location: dashboard.php?page=edit_classes");
+    header("Location: index.php?page=edit_classes");
     exit();
 }
 
@@ -56,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 if (isset($_GET['delete_id'])) {
     $delete_id = (int)$_GET['delete_id'];
     $conn->query("DELETE FROM classes WHERE id = $delete_id");
-    header("Location: dashboard.php?page=edit_classes");
+    header("Location: index.php?page=edit_classes");
     exit();
 }
 
@@ -148,7 +154,7 @@ $result = $conn->query("SELECT * FROM classes ORDER BY id ASC");
 
                 <button type="submit" class="btn btn-primary"><?= $editClass ? "Update Class" : "Add Class" ?></button>
                 <?php if ($editClass): ?>
-                    <a href="dashboard.php?page=edit_classes" class="btn btn-secondary">Cancel Edit</a>
+                    <a href="index.php?page=edit_classes" class="btn btn-secondary">Cancel Edit</a>
                 <?php endif; ?>
             </form>
         </div>

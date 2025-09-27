@@ -1,5 +1,9 @@
 <?php
 include 'db.php';
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // Folder path
 $uploadDir = "uploads/faculty/";
@@ -25,7 +29,7 @@ if (isset($_POST['add_faculty'])) {
             VALUES ('$name', '$designation', '$image', '$facebook', '$twitter', '$instagram')";
     mysqli_query($conn, $sql);
 
-    header("Location: dashboard.php?page=edit-faculty");
+    header("Location: index.php?page=edit-faculty");
     exit();
 }
 
@@ -63,7 +67,7 @@ if (isset($_POST['update_faculty'])) {
             WHERE id=$id";
     mysqli_query($conn, $sql);
 
-    header("Location: dashboard.php?page=edit-faculty");
+    header("Location: index.php?page=edit-faculty");
     exit();
 }
 
@@ -80,7 +84,7 @@ if (isset($_GET['delete'])) {
 
     mysqli_query($conn, "DELETE FROM faculty WHERE id=$id");
 
-    header("Location: dashboard.php?page=edit-faculty");
+    header("Location: index.php?page=edit-faculty");
     exit();
 }
 
@@ -172,7 +176,7 @@ if (isset($_GET['edit'])) {
                         <?= $editFaculty ? "Update Faculty" : "Save Faculty" ?>
                     </button>
                     <?php if ($editFaculty) { ?>
-                        <a href="dashboard.php?page=edit-faculty" class="btn btn-secondary">Cancel</a>
+                        <a href="index.php?page=edit-faculty" class="btn btn-secondary">Cancel</a>
                     <?php } ?>
                 </div>
             </form>
@@ -205,9 +209,9 @@ if (isset($_GET['edit'])) {
                             <?php if ($row['instagram']) echo "<a href='{$row['instagram']}' target='_blank'>Instagram</a>"; ?>
                         </td>
                         <td>
-                            <a href="dashboard.php?page=edit-faculty&edit=<?= $row['id'] ?>" 
+                            <a href="index.php?page=edit-faculty&edit=<?= $row['id'] ?>" 
                                class="btn btn-warning btn-sm">✏️ Edit</a>
-                            <a href="dashboard.php?page=edit-faculty&delete=<?= $row['id'] ?>" 
+                            <a href="index.php?page=edit-faculty&delete=<?= $row['id'] ?>" 
                                class="btn btn-danger btn-sm" 
                                onclick="return confirm('Delete this faculty?')">🗑️ Delete</a>
                         </td>

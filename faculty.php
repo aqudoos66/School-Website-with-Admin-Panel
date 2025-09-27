@@ -124,7 +124,7 @@ if (!$result) {
             if (mysqli_num_rows($result) > 0) {
                 while ($row = mysqli_fetch_assoc($result)) {
                     // Fix image path → remove double path issue
-                    $imgPath = "../" . $row['image'];
+                    $imgPath = "admin/" . $row['image'];
             ?>
             <div class="col-lg-4 col-md-6">
                 <div class="team-item text-center p-3 shadow rounded">

@@ -1,5 +1,11 @@
 <?php
 include 'db.php';
+session_start();
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
 
 // Fetch existing data
 $query = "SELECT * FROM about_us WHERE id=1 LIMIT 1";
@@ -52,7 +58,7 @@ if (isset($_POST['update'])) {
         WHERE id=1";
 
     if (mysqli_query($conn, $sql)) {
-        echo "<script>alert('Updated Successfully'); window.location.href='dashboard.php?page=edit-about_us';</script>";
+        echo "<script>alert('Updated Successfully'); window.location.href='index.php?page=edit-about_us';</script>";
     } else {
         echo "Error: " . mysqli_error($conn);
     }

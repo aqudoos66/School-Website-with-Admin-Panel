@@ -1,5 +1,10 @@
 <?php
 include 'db.php';
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
+
 
 // --------------------- Add Facility ---------------------
 if (isset($_POST['add_facility'])) {
@@ -10,7 +15,7 @@ if (isset($_POST['add_facility'])) {
 
     mysqli_query($conn, "INSERT INTO facilities (title, description, icon, color) 
                          VALUES ('$title','$description','$icon','$color')");
-    header("Location: dashboard.php?page=edit_facilities");
+    header("Location: index.php?page=edit_facilities");
     exit();
 }
 
@@ -25,7 +30,7 @@ if (isset($_POST['update_facility'])) {
     mysqli_query($conn, "UPDATE facilities 
                          SET title='$title', description='$description', icon='$icon', color='$color'
                          WHERE id=$id");
-    header("Location: dashboard.php?page=edit_facilities");
+    header("Location: index.php?page=edit_facilities");
     exit();
 }
 
@@ -33,7 +38,7 @@ if (isset($_POST['update_facility'])) {
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
     mysqli_query($conn, "DELETE FROM facilities WHERE id=$id");
-    header("Location: dashboard.php?page=edit_facilities");
+    header("Location: index.php?page=edit_facilities");
     exit();
 }
 
@@ -113,7 +118,7 @@ if (isset($_GET['edit'])) {
         <?php if ($editData) { ?>
             <!-- Agar edit mode hai to Update button dikhayega -->
             <button type="submit" name="update_facility" class="btn btn-primary btn-rounded mt-3">✏ Update Facility</button>
-            <a href="dashboard.php?page=edit_facilities" class="btn btn-secondary btn-rounded mt-3">Cancel</a>
+            <a href="index.php?page=edit_facilities" class="btn btn-secondary btn-rounded mt-3">Cancel</a>
         <?php } else { ?>
             <!-- Nahi to Add button dikhayega -->
             <button type="submit" name="add_facility" class="btn btn-success btn-rounded mt-3">➕ Add Facility</button>
@@ -145,9 +150,9 @@ if (isset($_GET['edit'])) {
                             <td><?= htmlspecialchars($row['description']); ?></td>
                             <td><span class="badge bg-<?= $row['color']; ?>"><?= $row['color']; ?></span></td>
                             <td>
-                                <a href="dashboard.php?page=edit-facilities&edit=<?= $row['id']; ?>" 
+                                <a href="index.php?page=edit-facilities&edit=<?= $row['id']; ?>" 
                                    class="btn btn-primary btn-sm me-2">✏ Edit</a>
-                                <a href="dashboard.php?page=edit_facilities&delete=<?= $row['id']; ?>" 
+                                <a href="index.php?page=edit_facilities&delete=<?= $row['id']; ?>" 
                                    class="btn btn-danger btn-sm"
                                    onclick="return confirm('Are you sure you want to delete this facility?');">🗑 Delete</a>
                             </td>

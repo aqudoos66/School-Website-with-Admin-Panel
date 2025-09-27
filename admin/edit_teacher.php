@@ -1,5 +1,9 @@
 <?php
 include 'db.php';
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
 
 // Fetch teacher section data
 $query = "SELECT * FROM teacher_section WHERE id=1 LIMIT 1";
@@ -19,7 +23,7 @@ if (isset($_POST['update_teacher'])) {
 
     $sql = "UPDATE teacher_section SET title='$title', description='$description', image='$image' WHERE id=1";
     if (mysqli_query($conn, $sql)) {
-        echo "<script>alert('Teacher Section Updated'); window.location.href='dashboard.php?page=edit-teacher';</script>";
+        echo "<script>alert('Teacher Section Updated'); window.location.href='index.php?page=edit-teacher';</script>";
     } else {
         echo "Error: " . mysqli_error($conn);
     }

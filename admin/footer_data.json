@@ -1,0 +1,35 @@
+{
+    "address": "123 Street, Nyk,",
+    "phone": "+923043986756",
+    "email": "info@example.hot",
+    "social": {
+        "twitter": "#",
+        "facebook": "#",
+        "youtube": "#",
+        "linkedin": "#"
+    },
+    "quick_links": [
+        {
+            "text": "About Us",
+            "url": "#"
+        },
+        {
+            "text": "Contact Us",
+            "url": "#"
+        },
+        {
+            "text": "Our Services",
+            "url": "#"
+        },
+        {
+            "text": "Privacy Policy",
+            "url": "#"
+        },
+        {
+            "text": "Terms &amp;amp;amp;amp;amp; Condition",
+            "url": "#"
+        }
+    ],
+    "newsletter_text": "ok bha",
+    "copyright_text": "kingt, All Right Reserved."
+}

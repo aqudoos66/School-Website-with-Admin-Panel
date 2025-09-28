@@ -58,20 +58,29 @@ $testimonials = [];
 $q = mysqli_query($conn, "SELECT client_name, profession, comment, image FROM testimonials ORDER BY id DESC");
 if ($q) {
     while ($row = mysqli_fetch_assoc($q)) {
-        // Fix image path
-        if (!empty($row['image']) && file_exists($row['image'])) {
-            $row['image'] = $row['image'];
+        // Make sure image path is correct for browser
+        if (!empty($row['image'])) {
+            $row['image'] = $row['image']; // already saved as admin/uploads/testimonials/xxxx.jpg
         } else {
-            $row['image'] = 'img/default.jpg';
+            $row['image'] = 'img/default.jpg'; // fallback
         }
         $testimonials[] = $row;
     }
 }
 ?>
 
+
 <?php
 include 'admin/db.php';
 $card = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM card WHERE id=1 LIMIT 1"));
+
+// Fetch site settings
+$settings = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM settings ORDER BY id DESC LIMIT 1"));
+
+// Default values if nothing is set
+$site_name = !empty($settings['site_name']) ? $settings['site_name'] : "Kider";
+$site_icon = !empty($settings['site_icon']) ? $settings['site_icon'] : "fa-book-reader";
+$site_logo = !empty($settings['site_logo']) ? $settings['site_logo'] : "";
 ?>
 
 
@@ -82,13 +91,13 @@ $card = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM card WHERE id=1 LI
 
 <head>
     <meta charset="utf-8">
-    <title>Kider - Preschool Website Template</title>
+    <title>Home - <?= htmlspecialchars($site_name); ?></title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
 
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+    <link href="admin/<?= htmlspecialchars($site_logo); ?>" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -123,9 +132,16 @@ $card = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM card WHERE id=1 LI
 
       <!-- Navbar Start -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top px-4 px-lg-5 py-lg-0">
-    <a href="index.php" class="navbar-brand">
-        <h1 class="m-0 text-primary"><i class="fa fa-book-reader me-3"></i>Kider</h1>
-    </a>
+<a href="index.php" class="navbar-brand d-flex align-items-center">
+    <?php if($site_logo): ?>
+        <!-- Show logo image if uploaded -->
+        <img src="admin/<?= htmlspecialchars($site_logo); ?>" alt="<?= htmlspecialchars($site_name); ?>" style="height:40px; width:40px; object-fit:cover; margin-right:10px;">
+    <?php else: ?>
+        <!-- Show font-awesome icon if no logo -->
+        <i class="fa <?= htmlspecialchars($site_icon); ?> me-3"></i>
+    <?php endif; ?>
+    <h1 class="m-0 text-primary"><?= htmlspecialchars($site_name); ?></h1>
+</a>
     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -160,7 +176,7 @@ $card = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM card WHERE id=1 LI
             <?php while ($row = mysqli_fetch_assoc($slider)): ?>
                 <?php 
                     $image = $row['image'] ?? '';
-                    $imagePath = "admin/IMG/" . htmlspecialchars($image);
+                    $imagePath = "admin/" . htmlspecialchars($image);
                 ?>
                 <div class="owl-carousel-item position-relative">
                     <img class="img-fluid"
@@ -692,9 +708,10 @@ $(document).ready(function(){
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
-            <h1 class="mb-3">School Classes</h1>
-            <p>Eirmod sed ipsum dolor sit rebum labore magna erat. Tempor ut dolore lorem kasd vero ipsum sit eirmod sit. Ipsum diam justo sed rebum vero dolor duo.</p>
-        </div>
+    <h1 class="mb-3">School Classes</h1>
+    <p>Explore our well-structured school classes designed to provide a nurturing learning environment, where students gain knowledge, skills, and confidence for a bright future.</p>
+</div>
+
         <div class="row g-4">
             <?php 
             // STEP 1: Database se saari classes fetch karein.
@@ -873,7 +890,6 @@ $(document).ready(function(){
         <!-- Team End -->
 
 <!-- Testimonial Start -->
-<!-- Testimonial Start -->
 <div class="container-xxl py-5">
     <div class="container">
         <div class="text-center mx-auto mb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 600px;">
@@ -888,8 +904,8 @@ $(document).ready(function(){
                         <p class="fs-5"><?= htmlspecialchars($row['comment']); ?></p>
                         <div class="d-flex align-items-center bg-white me-n5" style="border-radius: 50px 0 0 50px;">
                             <img class="img-fluid flex-shrink-0 rounded-circle" 
-                                 src="<?= $row['image']; ?>" 
-                                 style="width: 90px; height: 90px; object-fit:cover;">
+     src="admin/<?= htmlspecialchars($row['image']); ?>" 
+     style="width: 90px; height: 90px; object-fit:cover;">
                             <div class="ps-3">
                                 <h3 class="mb-1"><?= htmlspecialchars($row['client_name']); ?></h3>
                                 <span><?= htmlspecialchars($row['profession']); ?></span>
@@ -1063,18 +1079,29 @@ $(document).ready(function(){
                 <?php endif; ?>
             </div>
 
-            <!-- Photo Gallery (unchanged) -->
-            <div class="col-lg-3 col-md-6">
-                <h3 class="text-white mb-4">Photo Gallery</h3>
-                <div class="row g-2 pt-2">
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-1.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-2.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-3.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-4.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-5.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-6.jpg" alt=""></div>
-                </div>
+            <?php
+// Fetch latest 6 images from gallery
+$galleryResult = mysqli_query($conn, "SELECT `id`, `title`, `image` FROM `gallery` ORDER BY id DESC LIMIT 6");
+?>
+
+<div class="col-lg-3 col-md-6">
+    <h3 class="text-white mb-4">Photo Gallery</h3>
+    <div class="row g-2 pt-2">
+        <?php while($row = mysqli_fetch_assoc($galleryResult)): ?>
+            <?php 
+                $imgPath = "admin/" . $row['image']; // path from DB
+                // fallback if image missing
+                if (!file_exists($imgPath) || empty($row['image'])) {
+                    $imgPath = "img/default.png"; // default placeholder
+                }
+            ?>
+            <div class="col-4">
+                <img class="img-fluid rounded bg-light p-1" src="<?= htmlspecialchars($imgPath); ?>" alt="<?= htmlspecialchars($row['title']); ?>">
             </div>
+        <?php endwhile; ?>
+    </div>
+</div>
+
 
             <!-- Newsletter -->
             <div class="col-lg-3 col-md-6">

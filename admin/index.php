@@ -2,175 +2,131 @@
 session_start();
 include 'db.php';
 
-// Redirect if not logged in
-if (!isset($_SESSION['email'])) {
+// Redirect to login if not logged in
+if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
-// Handle logout
-if (isset($_POST['logout'])) {
-    session_unset();
-    session_destroy();
-    header("Location: login.php");
-    exit();
-}
-
-// Get requested page, default to home
-$page = isset($_GET['page']) ? $_GET['page'] : 'home';
-
-// Allowed pages
-$allowed_pages = [
-    'home',
-    'edit-about_us',
-    'edit-faculty',
-    'edit-facilities',
-    'edit-gallery',
-    'edit_contact',
-    'edit_footer',
-    'edit_slider',
-    'edit_classes',
-    'edit_comment',
-    'edit_card',
-    'edit-teacher'
-];
-
-// Validate page
-if (!in_array($page, $allowed_pages)) {
-    $page = 'home';
-}
-
-// ✅ Fetch counts from database
-function getCount($conn, $table) {
-    $result = $conn->query("SELECT COUNT(*) as total FROM $table");
-    $row = $result->fetch_assoc();
-    return $row['total'];
-}
-
-$total_users = getCount($conn, "users");
-$total_faculty = getCount($conn, "faculty");
-$total_classes = getCount($conn, "classes");
-$total_facilities = getCount($conn, "facilities");
-$total_testimonials = getCount($conn, "testimonials");
-$total_sliders = getCount($conn, "slider");
+// Fetch site data
+$about = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM about_us LIMIT 1"));
+$contact = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM contactus ORDER BY id DESC LIMIT 1"));
+$facilities = mysqli_query($conn, "SELECT * FROM facilities");
+$faculty = mysqli_query($conn, "SELECT * FROM faculty ORDER BY id DESC LIMIT 4");
+$classes = mysqli_query($conn, "SELECT * FROM classes ORDER BY id DESC LIMIT 4");
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Admin Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <meta charset="utf-8" />
+    <title>Dashboard - SB Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
-<body>
-<div class="d-flex">
-    <!-- Sidebar -->
-    <div class="d-flex flex-column flex-shrink-0 p-3 text-white sidebar position-fixed" style="width:250px; height:100vh; background:#343a40;">
-        <a href="?page=home" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-            <span class="fs-4 fw-bold">Admin Panel</span>
-        </a>
-        <hr>
-        <ul class="nav nav-pills flex-column mb-auto">
-            <!-- Home Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link text-white dropdown-toggle <?= ($page === 'edit_card' || $page === 'edit_slider' || $page === 'edit_classes' || $page === 'edit_comment') ? 'active' : '' ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Home
-                </a>
-                <ul class="dropdown-menu bg-dark border-0">
-                    <li><a class="dropdown-item text-white <?= ($page === 'edit_slider') ? 'active bg-primary' : '' ?>" href="?page=edit_slider">Edit Slider</a></li>
-                    <li><a class="dropdown-item text-white <?= ($page === 'edit_card') ? 'active bg-primary' : '' ?>" href="?page=edit_card">Edit Card</a></li>
-                    <li><a class="dropdown-item text-white <?= ($page === 'edit_comment') ? 'active bg-primary' : '' ?>" href="?page=edit_comment">Edit Comments</a></li>
-                    <li><a class="dropdown-item text-white <?= ($page === 'edit_classes') ? 'active bg-primary' : '' ?>" href="?page=edit_classes">Edit Classes</a></li>
-                </ul>
-            </li>
+<body class="sb-nav-fixed">
+    <?php include 'file/navbar.php'; ?>
 
-            <!-- About Us Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link text-white dropdown-toggle <?= ($page === 'edit-about_us' || $page === 'edit-teacher') ? 'active' : '' ?>" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    About Us
-                </a>
-                <ul class="dropdown-menu bg-dark border-0">
-                    <li><a class="dropdown-item text-white <?= ($page === 'edit-about_us') ? 'active bg-primary' : '' ?>" href="?page=edit-about_us">Edit About Us</a></li>
-                    <li><a class="dropdown-item text-white <?= ($page === 'edit-teacher') ? 'active bg-primary' : '' ?>" href="?page=edit-teacher">Edit Teacher Section</a></li>
-                </ul>
-            </li>
+    <div id="layoutSidenav">
+        <?php include 'file/sidebar.php'; ?>
 
-            <!-- Other pages -->
-            <?php
-            $pages = [
-                'Faculty' => 'edit-faculty',
-                'Facilities' => 'edit-facilities',
-                'Gallery' => 'edit-gallery',
-                'Contact Us' => 'edit_contact',
-            ];
-            foreach ($pages as $name => $page_link) {
-                $active = ($page === $page_link) ? 'active' : '';
-                echo "<li class='nav-item'>
-                        <a class='nav-link text-white $active' href='?page=$page_link'>$name</a>
-                      </li>";
-            }
-            ?>
-            <li class="nav-item mt-3">
-                <a class="nav-link text-white <?= ($page === 'edit_footer') ? 'active' : '' ?>" href="?page=edit_footer">Edit Footer</a>
-            </li>
-        </ul>
-    </div>
+        <div id="layoutSidenav_content">
+            <main>
+                <div class="container-fluid px-4">
+                    <h1 class="mt-4">Dashboard</h1>
+                    <ol class="breadcrumb mb-4">
+                        <li class="breadcrumb-item active">Overview</li>
+                    </ol>
 
-    <!-- Main content -->
-    <div class="p-4 w-100 main-area" style="margin-left:250px;">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="fw-bold">
-                <?php
-                if ($page === 'home') echo "Dashboard Overview";
-                elseif ($page === 'edit_slider') echo "Edit Slider";
-                elseif ($page === 'edit_card') echo "Edit Card";
-                elseif ($page === 'edit_comment') echo "Edit Comments";
-                elseif ($page === 'edit_footer') echo "Edit Footer";
-                elseif ($page === 'edit_classes') echo "Edit Classes";
-                elseif ($page === 'edit-about_us') echo "Edit About Us";
-                elseif ($page === 'edit-teacher') echo "Edit Teacher Section";
-                elseif ($page === 'edit-faculty') echo "Edit Faculty";
-                elseif ($page === 'edit-facilities') echo "Edit Facilities";
-                elseif ($page === 'edit-gallery') echo "Edit Gallery";
-                elseif ($page === 'edit_contact') echo "Edit Contact Us";
-                else echo ucfirst(str_replace('_', ' ', str_replace('edit-', '', $page)));
-                ?>
-            </h1>
-            <form method="POST" action="" style="margin:0;">
-                <button type="submit" name="logout" class="btn btn-danger">Logout</button>
-            </form>
-        </div>
+                    <!-- About Us -->
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="fas fa-info-circle"></i> About Us</div>
+                        <div class="card-body">
+                            <h3><?php echo $about['title']; ?></h3>
+                            <p><?php echo $about['description1']; ?></p>
+                            <p><?php echo $about['description2']; ?></p>
+                            <strong><?php echo $about['person_name']; ?> - <?php echo $about['designation']; ?></strong>
+                        </div>
+                    </div>
 
-        <div class="main-content p-3 bg-white shadow-sm rounded">
-            <?php
-            if ($page === 'home') {
-                echo "<h3>Welcome, " . htmlspecialchars($_SESSION['email']) . "!</h3>";
-                echo "<p class='mb-4'>Here are the current statistics of your website:</p>";
+                    <!-- Facilities -->
+                    <div class="row">
+                        <?php while ($row = mysqli_fetch_assoc($facilities)) { ?>
+                        <div class="col-md-3">
+                            <div class="card text-center mb-4 border-<?php echo $row['color']; ?>">
+                                <div class="card-body">
+                                    <i class="<?php echo $row['icon']; ?> fa-2x mb-2 text-<?php echo $row['color']; ?>"></i>
+                                    <h5><?php echo $row['title']; ?></h5>
+                                    <p><?php echo $row['description']; ?></p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php } ?>
+                    </div>
 
-                echo '<div class="row g-4">';
-                echo '<div class="col-md-4"><div class="card shadow-sm p-3 text-center"><h4>Users</h4><p class="fs-3 fw-bold">'.$total_users.'</p></div></div>';
-                echo '<div class="col-md-4"><div class="card shadow-sm p-3 text-center"><h4>Faculty</h4><p class="fs-3 fw-bold">'.$total_faculty.'</p></div></div>';
-                echo '<div class="col-md-4"><div class="card shadow-sm p-3 text-center"><h4>Classes</h4><p class="fs-3 fw-bold">'.$total_classes.'</p></div></div>';
-                echo '<div class="col-md-4"><div class="card shadow-sm p-3 text-center"><h4>Facilities</h4><p class="fs-3 fw-bold">'.$total_facilities.'</p></div></div>';
-                echo '<div class="col-md-4"><div class="card shadow-sm p-3 text-center"><h4>Testimonials</h4><p class="fs-3 fw-bold">'.$total_testimonials.'</p></div></div>';
-                echo '<div class="col-md-4"><div class="card shadow-sm p-3 text-center"><h4>Sliders</h4><p class="fs-3 fw-bold">'.$total_sliders.'</p></div></div>';
-                echo '</div>';
-            }
-            elseif ($page === 'edit_footer') include 'edit_footer.php';
-            elseif ($page === 'edit_slider') include 'edit_slider.php';
-            elseif ($page === 'edit_card') include 'card_edit.php';
-            elseif ($page === 'edit_comment') include 'edit_comment.php';
-            elseif ($page === 'edit_classes') include 'edit_classes.php';
-            elseif ($page === 'edit-about_us') include 'edit_aboutus.php';
-            elseif ($page === 'edit-teacher') include 'edit_teacher.php';
-            elseif ($page === 'edit-faculty') include 'edit_faculty.php';
-            elseif ($page === 'edit-facilities') include 'edit_facilities.php';
-            elseif ($page === 'edit-gallery') include 'edit_gallery.php';
-            elseif ($page === 'edit-contact_us') include 'edit_contact.php';
-            ?>
+                    <!-- Faculty -->
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="fas fa-users"></i> Faculty</div>
+                        <div class="card-body row">
+                            <?php while ($row = mysqli_fetch_assoc($faculty)) { ?>
+                            <div class="col-md-3 text-center">
+                                <img src="<?php echo $row['image']; ?>" class="img-fluid rounded-circle mb-2" width="100" height="100">
+                                <h6><?php echo $row['name']; ?></h6>
+                                <p><?php echo $row['designation']; ?></p>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+
+                    <!-- Classes -->
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="fas fa-book"></i> Classes</div>
+                        <div class="card-body row">
+                            <?php while ($row = mysqli_fetch_assoc($classes)) { ?>
+                            <div class="col-md-3">
+                                <div class="card mb-3">
+                                    <img src="<?php echo $row['class_image']; ?>" class="card-img-top" alt="">
+                                    <div class="card-body">
+                                        <h5><?php echo $row['title']; ?></h5>
+                                        <p>Teacher: <?php echo $row['teacher_name']; ?></p>
+                                        <p>Price: <?php echo $row['price']; ?></p>
+                                        <p>Age: <?php echo $row['age_range']; ?></p>
+                                        <p>Time: <?php echo $row['time']; ?></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+
+                    <!-- Contact Info -->
+                    <div class="card mb-4">
+                        <div class="card-header"><i class="fas fa-envelope"></i> Contact Info</div>
+                        <div class="card-body">
+                            <p><strong>Address:</strong> <?php echo $contact['address']; ?></p>
+                            <p><strong>Phone:</strong> <?php echo $contact['phone']; ?></p>
+                            <p><strong>Email:</strong> <?php echo $contact['email']; ?></p>
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">&copy; School Website <?php echo date("Y"); ?></div>
+                        <div>
+                            <a href="#">Privacy Policy</a>
+                            &middot;
+                            <a href="#">Terms &amp; Conditions</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/scripts.js"></script>
 </body>
 </html>

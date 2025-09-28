@@ -14,6 +14,14 @@ $footerData = $result && $result->num_rows > 0 ? $result->fetch_assoc() : [
 
 // Quick links array
 $quickLinks = !empty($footerData['quick_links']) ? explode('|', $footerData['quick_links']) : [];
+
+// Fetch site settings
+$settings = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM settings ORDER BY id DESC LIMIT 1"));
+
+// Default values if nothing is set
+$site_name = !empty($settings['site_name']) ? $settings['site_name'] : "Kider";
+$site_icon = !empty($settings['site_icon']) ? $settings['site_icon'] : "fa-book-reader";
+$site_logo = !empty($settings['site_logo']) ? $settings['site_logo'] : "";
 ?>
 
 
@@ -22,13 +30,13 @@ $quickLinks = !empty($footerData['quick_links']) ? explode('|', $footerData['qui
 
 <head>
     <meta charset="utf-8">
-    <title>Kider - Preschool Website Template</title>
+    <title>Faculty - <?= htmlspecialchars($site_name); ?></title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
 
     <!-- Favicon -->
-    <link href="img/favicon.ico" rel="icon">
+    <link href="admin/<?= htmlspecialchars($site_logo); ?>" rel="icon">
 
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -64,9 +72,16 @@ $quickLinks = !empty($footerData['quick_links']) ? explode('|', $footerData['qui
 
             <!-- Navbar Start -->
 <nav class="navbar navbar-expand-lg bg-white navbar-light sticky-top px-4 px-lg-5 py-lg-0">
-    <a href="index.html" class="navbar-brand">
-        <h1 class="m-0 text-primary"><i class="fa fa-book-reader me-3"></i>Kider</h1>
-    </a>
+    <a href="index.php" class="navbar-brand d-flex align-items-center">
+    <?php if($site_logo): ?>
+        <!-- Show logo image if uploaded -->
+        <img src="admin/<?= htmlspecialchars($site_logo); ?>" alt="<?= htmlspecialchars($site_name); ?>" style="height:40px; width:40px; object-fit:cover; margin-right:10px;">
+    <?php else: ?>
+        <!-- Show font-awesome icon if no logo -->
+        <i class="fa <?= htmlspecialchars($site_icon); ?> me-3"></i>
+    <?php endif; ?>
+    <h1 class="m-0 text-primary"><?= htmlspecialchars($site_name); ?></h1>
+</a>
     <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -394,18 +409,29 @@ if (!$result) {
                 <?php endif; ?>
             </div>
 
-            <!-- Photo Gallery (unchanged) -->
-            <div class="col-lg-3 col-md-6">
-                <h3 class="text-white mb-4">Photo Gallery</h3>
-                <div class="row g-2 pt-2">
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-1.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-2.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-3.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-4.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-5.jpg" alt=""></div>
-                    <div class="col-4"><img class="img-fluid rounded bg-light p-1" src="img/classes-6.jpg" alt=""></div>
-                </div>
+            <?php
+// Fetch latest 6 images from gallery
+$galleryResult = mysqli_query($conn, "SELECT `id`, `title`, `image` FROM `gallery` ORDER BY id DESC LIMIT 6");
+?>
+
+<div class="col-lg-3 col-md-6">
+    <h3 class="text-white mb-4">Photo Gallery</h3>
+    <div class="row g-2 pt-2">
+        <?php while($row = mysqli_fetch_assoc($galleryResult)): ?>
+            <?php 
+                $imgPath = "admin/" . $row['image']; // path from DB
+                // fallback if image missing
+                if (!file_exists($imgPath) || empty($row['image'])) {
+                    $imgPath = "img/default.png"; // default placeholder
+                }
+            ?>
+            <div class="col-4">
+                <img class="img-fluid rounded bg-light p-1" src="<?= htmlspecialchars($imgPath); ?>" alt="<?= htmlspecialchars($row['title']); ?>">
             </div>
+        <?php endwhile; ?>
+    </div>
+</div>
+
 
             <!-- Newsletter -->
             <div class="col-lg-3 col-md-6">

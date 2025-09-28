@@ -1,51 +1,76 @@
 <?php
 session_start();
-include 'db.php';
+include 'db.php'; // database connection
 
-if (isset($_POST['login'])) {
-    $email = trim($_POST['email']);
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = $_POST['password'];
 
-    // Use prepared statement to prevent SQL Injection
-    $stmt = $conn->prepare("SELECT * FROM users WHERE email=?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    $sql = "SELECT * FROM users WHERE email='$email' LIMIT 1";
+    $result = mysqli_query($conn, $sql);
 
-    if ($result->num_rows === 1) {
-        $user = $result->fetch_assoc();
+    if ($result && mysqli_num_rows($result) == 1) {
+        $user = mysqli_fetch_assoc($result);
 
-        // Verify password (use password_hash() when storing)
         if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
             $_SESSION['email'] = $user['email'];
-            $_SESSION['user_id'] = $user['id']; // optional
-            session_regenerate_id(true); // prevent session fixation
+            $_SESSION['name'] = $user['name'];
+
             header("Location: index.php");
             exit();
         } else {
-            $error = "Invalid Email or Password!";
+            $error = "Invalid password!";
         }
     } else {
-        $error = "Invalid Email or Password!";
+        $error = "User not found!";
     }
 }
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Login Page</title>
-    <link rel="stylesheet" href="style.css">
+    <meta charset="utf-8" />
+    <title>Login - School Admin</title>
+    <link href="css/styles.css" rel="stylesheet" />
 </head>
-<body>
-<div class="form-container">
-    <h2>Login</h2>
-    <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
-    <form method="POST">
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit" name="login">Login</button>
-    </form>
-    <p><a href="register.php">Register</a> | <a href="forgot_password.php">Forgot Password?</a></p>
-</div>
+<body class="bg-primary">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-5">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
+                                <div class="card-body">
+                                    <?php if($error) echo "<div class='alert alert-danger'>$error</div>"; ?>
+                                    <form method="POST" action="">
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" name="email" type="email" required placeholder="name@example.com" />
+                                            <label>Email address</label>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <input class="form-control" name="password" type="password" required placeholder="Password" />
+                                            <label>Password</label>
+                                        </div>
+                                        <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
+                                            <a class="small" href="password.php">Forgot Password?</a>
+                                            <button class="btn btn-primary" type="submit">Login</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="card-footer text-center py-3">
+                                    <div class="small"><a href="register.php">Need an account? Sign up!</a></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
 </body>
 </html>

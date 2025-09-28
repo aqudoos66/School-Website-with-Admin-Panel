@@ -1,11 +1,6 @@
 <?php
-session_start();
-if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
-    exit();
-}
-
-include 'db.php';
+include 'file/session.php';
+include 'db.php'; 
 
 // -------------------- UPDATE PRINCIPAL SECTION --------------------
 if (isset($_POST['update_principal'])) {

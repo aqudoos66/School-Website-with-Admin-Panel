@@ -1,12 +1,6 @@
-```php
 <?php
-session_start();
-if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
-    exit();
-}
-
-include 'db.php';
+include 'file/session.php';
+include 'db.php'; 
 
 // -------------------- ADD TESTIMONIAL --------------------
 if (isset($_POST['add_testimonial'])) {
@@ -212,4 +206,3 @@ $result = mysqli_query($conn, "SELECT id, client_name, profession, comment, imag
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-```

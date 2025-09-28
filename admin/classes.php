@@ -1,12 +1,6 @@
 <?php
-session_start();
-include 'db.php';
-
-// -------------------- SESSION CHECK --------------------
-if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
-    exit();
-}
+include 'file/session.php';
+include 'db.php'; 
 
 // -------------------- ADD CLASS --------------------
 if (isset($_POST['save_class'])) {

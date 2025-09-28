@@ -1,12 +1,6 @@
-```php
 <?php
-session_start();
-if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
-    exit();
-}
-
-include 'db.php';
+include 'file/session.php';
+include 'db.php'; 
 
 // -------------------- ADD SLIDE --------------------
 if (isset($_POST['add_slide'])) {
@@ -263,4 +257,3 @@ $result = mysqli_query($conn, "SELECT id, slide_number, image, heading, paragrap
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-```

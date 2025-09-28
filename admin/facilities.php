@@ -1,11 +1,6 @@
 <?php
-session_start();
-if (!isset($_SESSION['email'])) {
-    header("Location: login.php");
-    exit();
-}
-
-include 'db.php';
+include 'file/session.php';
+include 'db.php'; 
 
 // -------------------- ADD FACILITY (Only if < 4) --------------------
 if (isset($_POST['add_facility'])) {

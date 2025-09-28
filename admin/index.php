@@ -1,12 +1,6 @@
 <?php
-session_start();
-include 'db.php';
-
-// Redirect to login if not logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
+include 'file/session.php';
+include 'db.php'; 
 
 // Fetch site data
 $about = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM about_us LIMIT 1"));

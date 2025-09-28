@@ -26,7 +26,7 @@ $allowed_pages = [
     'edit-faculty',
     'edit-facilities',
     'edit-gallery',
-    'edit-contact_us',
+    'edit_contact',
     'edit_footer',
     'edit_slider',
     'edit_classes',
@@ -101,7 +101,7 @@ $total_sliders = getCount($conn, "slider");
                 'Faculty' => 'edit-faculty',
                 'Facilities' => 'edit-facilities',
                 'Gallery' => 'edit-gallery',
-                'Contact Us' => 'edit-contact_us',
+                'Contact Us' => 'edit_contact',
             ];
             foreach ($pages as $name => $page_link) {
                 $active = ($page === $page_link) ? 'active' : '';
@@ -132,7 +132,7 @@ $total_sliders = getCount($conn, "slider");
                 elseif ($page === 'edit-faculty') echo "Edit Faculty";
                 elseif ($page === 'edit-facilities') echo "Edit Facilities";
                 elseif ($page === 'edit-gallery') echo "Edit Gallery";
-                elseif ($page === 'edit-contact_us') echo "Edit Contact Us";
+                elseif ($page === 'edit_contact') echo "Edit Contact Us";
                 else echo ucfirst(str_replace('_', ' ', str_replace('edit-', '', $page)));
                 ?>
             </h1>
@@ -166,7 +166,7 @@ $total_sliders = getCount($conn, "slider");
             elseif ($page === 'edit-faculty') include 'edit_faculty.php';
             elseif ($page === 'edit-facilities') include 'edit_facilities.php';
             elseif ($page === 'edit-gallery') include 'edit_gallery.php';
-            elseif ($page === 'edit-contact_us') include 'edit_contact_us.php';
+            elseif ($page === 'edit-contact_us') include 'edit_contact.php';
             ?>
         </div>
     </div>

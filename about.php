@@ -115,8 +115,8 @@ $site_logo = !empty($settings['site_logo']) ? $settings['site_logo'] : "";
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <div class="navbar-nav mx-auto">
-            <a href="index.php" class="nav-item nav-link active">Home</a>
-            <a href="about.php" class="nav-item nav-link">About Us</a>
+            <a href="index.php" class="nav-item nav-link">Home</a>
+            <a href="about.php" class="nav-item nav-link active">About Us</a>
             <a href="faculty.php" class="nav-item nav-link">Faculty</a>
             <a href="facilities.php" class="nav-item nav-link">Facilities</a>
             <a href="gallery.php" class="nav-item nav-link">Gallery</a>
